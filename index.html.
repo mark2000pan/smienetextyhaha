@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Príbehy</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        textarea { height: 200px; resize: vertical; }
+        button { background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #219150; }
+        .story-card { background: #fff; border-left: 5px solid #27ae60; padding: 15px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        .story-card h3 { margin-top: 0; color: #2c3e50; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: #e74c3c; padding: 5px 10px; font-size: 12px; }
+        .delete-btn:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🖋️ Moje Online Príbehy</h1>
+    
+    <input type="text" id="title" placeholder="Názov príbehu...">
+    <textarea id="content" placeholder="Tu napíš svoj príbeh..."></textarea>
+    <button onclick="saveStory()">Uložiť príbeh</button>
+
+    <div id="stories-container">
+        </div>
+</div>
+
+<script>
+    // Načítanie príbehov pri otvorení stránky
+    window.onload = displayStories;
+
+    function saveStory() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+
+        if (!title || !content) {
+            alert("Prosím, vyplň názov aj obsah!");
+            return;
+        }
+
+        const story = { title, content, id: Date.now() };
+        let stories = JSON.parse(localStorage.getItem('myStories')) || [];
+        stories.push(story);
+        
+        localStorage.setItem('myStories', JSON.stringify(stories));
+        
+        // Vyčistenie polí
+        document.getElementById('title').value = '';
+        document.getElementById('content').value = '';
+        
+        displayStories();
+    }
+
+    function displayStories() {
+        const container = document.getElementById('stories-container');
+        const stories = JSON.parse(localStorage.getItem('myStories')) || [];
+        
+        container.innerHTML = '<h2>Uložené texty</h2>';
+        
+        stories.reverse().forEach(story => {
+            container.innerHTML += `
+                <div class="story-card">
+                    <h3>${story.title}</h3>
+                    <p>${story.content.replace(/\n/g, '<br>')}</p>
+                    <button class="delete-btn" onclick="deleteStory(${story.id})">Zmazať</button>
+                </div>
+            `;
+        });
+    }
+
+    function deleteStory(id) {
+        let stories = JSON.parse(localStorage.getItem('myStories')) || [];
+        stories = stories.filter(s => s.id !== id);
+        localStorage.setItem('myStories', JSON.stringify(stories));
+        displayStories();
+    }
+</script>
+
+</body>
+</html>
